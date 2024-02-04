@@ -6,16 +6,22 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.imsoft.kotlinpostsharingapp.databinding.ActivityGetPostBinding
 
 class GetPostActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGetPostBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGetPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        auth = Firebase.auth
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -30,6 +36,7 @@ class GetPostActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         } else {
+            auth.signOut()
             val intent = Intent(this@GetPostActivity, MainActivity::class.java)
             startActivity(intent)
             finish()
