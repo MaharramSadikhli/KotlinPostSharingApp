@@ -1,4 +1,4 @@
-package com.imsoft.kotlinpostsharingapp
+package com.imsoft.kotlinpostsharingapp.view
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,15 +6,22 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.imsoft.kotlinpostsharingapp.R
 import com.imsoft.kotlinpostsharingapp.databinding.ActivityGetPostBinding
+import com.imsoft.kotlinpostsharingapp.model.Post
 
 class GetPostActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGetPostBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var postArrayList: ArrayList<Post>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +29,11 @@ class GetPostActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = Firebase.auth
+        firestore = Firebase.firestore
+
+        postArrayList = ArrayList<Post>()
+
+        getPost()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -42,6 +54,37 @@ class GetPostActivity : AppCompatActivity() {
             finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun getPost() {
+        
+        firestore.collection("Posts").addSnapshotListener { value, error ->
+
+            if (error == null) {
+                if (value != null && !(value.isEmpty)) {
+                    val documents = value.documents
+
+                    for (document in documents) {
+
+                        val userEmail = document["userEmail"] as String
+                        val userComment = document["userComment"] as String
+                        val downloadUrl = document["downloadUrl"] as String
+
+                        println(userComment)
+
+                        val post = Post(userEmail, userComment, downloadUrl)
+
+                        postArrayList.add(post)
+
+
+                    }
+                }
+            } else {
+                Toast.makeText(this@GetPostActivity, error.localizedMessage, Toast.LENGTH_LONG).show()
+            }
+
+        }
+        
     }
 
 

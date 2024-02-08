@@ -1,4 +1,4 @@
-package com.imsoft.kotlinpostsharingapp
+package com.imsoft.kotlinpostsharingapp.view
 
 import android.Manifest
 import android.content.Intent
