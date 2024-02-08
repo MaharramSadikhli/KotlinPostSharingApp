@@ -7,12 +7,14 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.imsoft.kotlinpostsharingapp.R
+import com.imsoft.kotlinpostsharingapp.adapter.PostAdapter
 import com.imsoft.kotlinpostsharingapp.databinding.ActivityGetPostBinding
 import com.imsoft.kotlinpostsharingapp.model.Post
 
@@ -22,6 +24,7 @@ class GetPostActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
     private lateinit var postArrayList: ArrayList<Post>
+    private lateinit var postAdapter: PostAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +37,10 @@ class GetPostActivity : AppCompatActivity() {
         postArrayList = ArrayList<Post>()
 
         getPost()
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(this@GetPostActivity)
+        postAdapter = PostAdapter(postArrayList)
+        binding.recyclerView.adapter = postAdapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -76,8 +83,9 @@ class GetPostActivity : AppCompatActivity() {
 
                         postArrayList.add(post)
 
-
                     }
+
+                    postAdapter.notifyDataSetChanged()
                 }
             } else {
                 Toast.makeText(this@GetPostActivity, error.localizedMessage, Toast.LENGTH_LONG).show()
