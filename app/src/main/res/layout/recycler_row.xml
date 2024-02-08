@@ -5,11 +5,22 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="@color/black"
+        >
+    </View>
+
+
     <TextView
         android:id="@+id/recyclerViewEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
         android:text="@string/user_email"
         android:textSize="20sp"
@@ -39,5 +50,6 @@
         android:textStyle="italic"
         >
     </TextView>
+
 
 </LinearLayout>

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.imsoft.kotlinpostsharingapp.R
@@ -65,11 +66,15 @@ class GetPostActivity : AppCompatActivity() {
 
     private fun getPost() {
         
-        firestore.collection("Posts").addSnapshotListener { value, error ->
+        firestore.collection("Posts")
+            .orderBy("date", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
 
             if (error == null) {
                 if (value != null && !(value.isEmpty)) {
                     val documents = value.documents
+
+                    postArrayList.clear()
 
                     for (document in documents) {
 
@@ -77,7 +82,6 @@ class GetPostActivity : AppCompatActivity() {
                         val userComment = document["userComment"] as String
                         val downloadUrl = document["downloadUrl"] as String
 
-                        println(userComment)
 
                         val post = Post(userEmail, userComment, downloadUrl)
 

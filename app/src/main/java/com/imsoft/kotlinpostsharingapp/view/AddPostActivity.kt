@@ -82,6 +82,8 @@ class AddPostActivity : AppCompatActivity() {
 
                                 firestore.collection("Posts").add(postMap)
                                     .addOnSuccessListener {
+                                        val intent = Intent(this@AddPostActivity, GetPostActivity::class.java)
+                                        startActivity(intent)
                                         finish()
                                     }
                                     .addOnFailureListener {

@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.imsoft.kotlinpostsharingapp.databinding.RecyclerRowBinding
 import com.imsoft.kotlinpostsharingapp.model.Post
+import com.squareup.picasso.Picasso
 
 class PostAdapter(val postList: ArrayList<Post>): RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
@@ -23,6 +24,7 @@ class PostAdapter(val postList: ArrayList<Post>): RecyclerView.Adapter<PostAdapt
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         holder.binding.recyclerViewEmail.text = postList[position].email
         holder.binding.recyclerViewComment.text = postList[position].comment
+        Picasso.get().load(postList[position].downloadUrl).into(holder.binding.recyclerViewImage)
     }
 
     override fun getItemCount(): Int {
