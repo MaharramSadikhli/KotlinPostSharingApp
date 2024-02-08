@@ -15,7 +15,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import com.imsoft.kotlinpostsharingapp.databinding.ActivityAddPostBinding
+import java.util.UUID
 
 class AddPostActivity : AppCompatActivity() {
 
@@ -23,6 +32,9 @@ class AddPostActivity : AppCompatActivity() {
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private var selectedImage: Uri? = null
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var storage: FirebaseStorage
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +42,61 @@ class AddPostActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         registerLauncher()
+
+        auth = Firebase.auth
+        firestore = Firebase.firestore
+        storage = Firebase.storage
     }
 
-    fun postBtnClick(view: View) {}
+    fun postBtnClick(view: View) {
+
+        val uuid = UUID.randomUUID()
+        val imageName = "$uuid.jpg"
+
+        val storageRef = storage.reference
+
+        val imagesRef = storageRef.child("images")
+        val imageRef = imagesRef.child(imageName)
+
+        val uploadTask = imageRef.putFile(selectedImage!!) // check null
+
+
+        if (selectedImage != null) {
+
+            uploadTask
+                .addOnSuccessListener {
+
+                    imageRef.downloadUrl
+                        .addOnSuccessListener {
+                            val downloadUrl = it.toString()
+                            val userEmail = auth.currentUser!!.email
+                            val userComment = binding.commentText.text.toString()
+
+                            if (auth.currentUser != null) {
+                                val postMap = hashMapOf<String, Any>()
+
+                                postMap["userEmail"] = userEmail!!
+                                postMap["userComment"] = userComment
+                                postMap["downloadUrl"] = downloadUrl
+                                postMap["date"] = Timestamp.now()
+
+                                firestore.collection("Posts").add(postMap)
+                                    .addOnSuccessListener {
+                                        finish()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this@AddPostActivity, it.localizedMessage, Toast.LENGTH_LONG).show()
+                                    }
+                            }
+                        }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this@AddPostActivity, it.localizedMessage, Toast.LENGTH_LONG).show()
+                }
+
+        }
+
+    }
     fun selectImage(view: View) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
